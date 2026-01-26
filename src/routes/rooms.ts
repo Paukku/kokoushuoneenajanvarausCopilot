@@ -11,11 +11,21 @@ router.get('/', (_req, res) => {
 router.get('/:roomId/bookings', (req, res) => {
   try {
     const { roomId } = req.params;
-    const b = roomService.getBookings(roomId);
-    res.json(b);
+    const bookings = roomService.getBookings(roomId);
+    res.json(bookings);
   } catch (e) {
-    if (e instanceof ApiError) return res.status(e.status).json({ error: e.message });
-    return res.status(500).json({ error: 'Sisäinen palvelinvirhe' });
+    if (e instanceof ApiError) {
+      return res.status(e.status).json({
+        code: e.code,
+        message: e.message,
+        timestamp: e.timestamp
+      });
+    }
+    return res.status(500).json({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Sisäinen palvelinvirhe',
+      timestamp: new Date().toISOString()
+    });
   }
 });
 

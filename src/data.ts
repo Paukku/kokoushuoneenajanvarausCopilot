@@ -1,4 +1,4 @@
-import { Room, Booking } from './models';
+import { Room, Booking, Booker } from './models';
 import { v4 as uuidv4 } from 'uuid';
 
 // Predefined rooms (5 rooms)
@@ -11,6 +11,25 @@ export const ROOMS: Room[] = [
 ];
 
 export const bookings: Booking[] = [];
+
+// Generate a 6-character booking ID
+function generateBookingId(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+// Ensure uniqueness of booking IDs
+function generateUniqueBookingId(): string {
+  let id: string;
+  do {
+    id = generateBookingId();
+  } while (bookings.some(b => b.id === id));
+  return id;
+}
 
 export function roomExists(roomId: string): boolean {
   return ROOMS.some(r => r.id === roomId);
@@ -29,18 +48,20 @@ export function isOverlap(roomId: string, startIso: string, endIso: string): boo
     if (b.roomId !== roomId) continue;
     const s = new Date(b.start).getTime();
     const e = new Date(b.end).getTime();
-    // overlap if intervals intersect at all
+    // overlap if intervals intersect at all (strict: start < e && end > s)
     if (start < e && end > s) return true;
   }
   return false;
 }
 
-export function addBooking(roomId: string, startIso: string, endIso: string) {
+export function addBooking(roomId: string, startIso: string, endIso: string, booker: Booker): Booking {
   const b: Booking = {
-    id: uuidv4(),
+    uuid: uuidv4(),
+    id: generateUniqueBookingId(),
     roomId,
     start: startIso,
     end: endIso,
+    booker,
     createdAt: new Date().toISOString()
   };
   bookings.push(b);
@@ -52,4 +73,9 @@ export function deleteBooking(id: string): boolean {
   if (idx === -1) return false;
   bookings.splice(idx, 1);
   return true;
+}
+
+// Clear all bookings (for testing)
+export function clearBookings(): void {
+  bookings.length = 0;
 }
