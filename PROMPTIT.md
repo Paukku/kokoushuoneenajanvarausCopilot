@@ -197,3 +197,39 @@ Dokumentaatio
 ✅ Päivitetty README.md API:n käytölla
 ✅ Näytetään vaatimukset ja esimerkit
 Sovellus rakennetaan onnistuneesti ja kaikki 50 testiä menevät läpi! ✨
+
+---
+PROMPTI:
+Sama try/catch + apierror + 500 fallback toistuu useassa endpointissa. Muuta nämä yhteiseen error middlewareen
+
+AI:
+Optimizing tool selection...
+
+Näen toistuvat error handlingin. Luon error middlewaren ja muokkaan route-tiedostoja käyttämään sitä:
+
+Created errorHandler.ts
+
+Edited
+bookings.ts+17-47
+Edited
+rooms.ts+6-21
+Edited
+index.ts+4-0
+Valmis! Luoin centralisoitua error middlewaaren seuraavilla parannuksilla:
+
+Uusi errorHandler.ts - sisältää:
+
+errorHandler middleware: käsittelee kaikki virheet keskitetysti
+asyncHandler wrapper: automaattisesti nappaa poikkeukset ja välittää ne middlewaarelle
+Muokattu bookings.ts - poistettu kaikki try/catch-lohkot, käytetään asyncHandler
+
+Muokattu rooms.ts - poistettu toistuvat error-käsittelyt
+
+Muokattu index.ts - errorHandler middleware rekisteröity viimeisenä
+
+Etuja:
+
+✅ DRY-periaate: error logiikka vain yhdessä paikassa
+✅ Yhtenäinen virhekäsittely kaikissa endpointeissa
+✅ Helpompi ylläpitää ja laajentaa
+✅ Koodi on puhtaampaa ja luettavampaa
