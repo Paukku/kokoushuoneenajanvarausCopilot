@@ -11,7 +11,7 @@ export interface Booker {
 
 export interface Booking {
   uuid: string;
-  id: string;
+  reservationId: string;
   roomId: string;
   start: string; // ISO 8601
   end: string; // ISO 8601

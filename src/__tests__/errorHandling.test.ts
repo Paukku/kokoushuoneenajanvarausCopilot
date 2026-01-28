@@ -225,7 +225,7 @@ describe('Booking Service - Error Handling', () => {
     }
   });
 
-  test('should return BOOKING_NOT_FOUND for non-existent booking ID', () => {
+  test('should return BOOKING_NOT_FOUND for non-existent reservation ID', () => {
     try {
       bookingService.cancelBooking('NONEXISTENT');
       fail('Should have thrown');

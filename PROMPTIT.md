@@ -233,3 +233,46 @@ Etuja:
 ✅ Yhtenäinen virhekäsittely kaikissa endpointeissa
 ✅ Helpompi ylläpitää ja laajentaa
 ✅ Koodi on puhtaampaa ja luettavampaa
+
+PROMPTI:
+Muuta booking id sanaksi reservationId kaikissa, missä sitä on käytetty
+
+AI:
+Etsitään ensin kaikki kohdat, joissa "booking id" tai "bookingId" esiintyvät:
+
+Nyt tarkempi haku kaikista esiintymisistä. Etsitään "id"-kenttiä, joka liittyy varauksiin:
+
+Nyt näen koko rakenteen. Voin nähdä, että id on booking-objektin kenttä models.ts:ssa. Muutan kaikki "booking id" -viittaukset sekä id-kentän reservationId:ksi. Aloitan key files:
+
+Tarkistan vielä kaikki test-tiedostot:
+
+Nyt teen kaikki muutokset kerralla. Muutan:
+
+models.ts: id → reservationId
+data.ts: id → reservationId ja funktioissa
+bookingService.ts: id → reservationId
+bookings.ts routes: :id → :reservationId
+Kaikki test-tiedostot: .id → .reservationId
+Korjaan virheen - lisään explanation-kentän oikein:
+
+Edited
+models.ts+1-1
+Edited
+data.ts+11-11
+Edited
+bookingService.ts+3-3
+Edited
+bookings.ts+3-3
+Edited
+bookingIdValidation.test.ts+15-15
+Edited
+basicFunctionality.test.ts+6-6
+Edited
+errorHandling.test.ts+1-1
+Valmiiksi! Olen muuttanut kaikki "booking id" -viittaukset sanaksi "reservationId" koko koodissa. Muutokset sisälsivät:
+
+models.ts: id → reservationId Booking-interfacessa
+data.ts: generateBookingId() → generateReservationId() ja generateUniqueBookingId() → generateUniqueReservationId() funktiot sekä niiden käyttö
+bookingService.ts: cancelBooking() parametri id → reservationId
+bookings.ts: DELETE endpoint parametri /:id → /:reservationId
+Test-tiedostot: Kaikki .id viittaukset → .reservationId sekä kuvaavat tekstit päivitetty

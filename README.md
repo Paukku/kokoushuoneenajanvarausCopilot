@@ -8,7 +8,7 @@ REST-tyyppinen rajapinta kokoushuoneiden varaamiseen. Sovellus toteutettu TypeSc
 # Asenna riippuvuudet
 npm install
 
-# Kehityskäynnistys (ライブreload)
+# Kehityskäynnistys
 npm run dev
 
 # Testit

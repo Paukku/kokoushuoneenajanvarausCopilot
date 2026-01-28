@@ -28,7 +28,7 @@ describe('Booking Service - Basic Functionality', () => {
       expect(booking.booker.email).toBe('john@example.com');
     });
 
-    test('should return a booking ID that is 6 characters long', () => {
+    test('should return a reservation ID that is 6 characters long', () => {
       const start = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
       const end = new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString();
 
@@ -40,8 +40,8 @@ describe('Booking Service - Basic Functionality', () => {
         bookerEmail: 'john@example.com'
       });
 
-      expect(booking.id).toHaveLength(6);
-      expect(/^[A-Z0-9]{6}$/.test(booking.id)).toBe(true);
+      expect(booking.reservationId).toHaveLength(6);
+      expect(/^[A-Z0-9]{6}$/.test(booking.reservationId)).toBe(true);
     });
 
     test('should store the booking in the system', () => {
@@ -58,12 +58,12 @@ describe('Booking Service - Basic Functionality', () => {
 
       const bookings = bookingService.listBookings('room-1');
       expect(bookings).toHaveLength(1);
-      expect(bookings[0].id).toBe(booking.id);
+      expect(bookings[0].reservationId).toBe(booking.reservationId);
     });
   });
 
   describe('Booking Cancellation', () => {
-    test('should cancel a booking with valid booking ID', () => {
+    test('should cancel a booking with valid reservation ID', () => {
       const start = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
       const end = new Date(Date.now() + 25 * 60 * 60 * 1000).toISOString();
 
@@ -77,7 +77,7 @@ describe('Booking Service - Basic Functionality', () => {
 
       expect(bookingService.listBookings('room-1')).toHaveLength(1);
 
-      bookingService.cancelBooking(booking.id);
+      bookingService.cancelBooking(booking.reservationId);
 
       expect(bookingService.listBookings('room-1')).toHaveLength(0);
     });

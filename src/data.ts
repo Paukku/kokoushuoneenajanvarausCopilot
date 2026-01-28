@@ -12,8 +12,8 @@ export const ROOMS: Room[] = [
 
 export const bookings: Booking[] = [];
 
-// Generate a 6-character booking ID
-function generateBookingId(): string {
+// Generate a 6-character reservation ID
+function generateReservationId(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
   for (let i = 0; i < 6; i++) {
@@ -22,13 +22,13 @@ function generateBookingId(): string {
   return result;
 }
 
-// Ensure uniqueness of booking IDs
-function generateUniqueBookingId(): string {
-  let id: string;
+// Ensure uniqueness of reservation IDs
+function generateUniqueReservationId(): string {
+  let reservationId: string;
   do {
-    id = generateBookingId();
-  } while (bookings.some(b => b.id === id));
-  return id;
+    reservationId = generateReservationId();
+  } while (bookings.some(b => b.reservationId === reservationId));
+  return reservationId;
 }
 
 export function roomExists(roomId: string): boolean {
@@ -57,7 +57,7 @@ export function isOverlap(roomId: string, startIso: string, endIso: string): boo
 export function addBooking(roomId: string, startIso: string, endIso: string, booker: Booker): Booking {
   const b: Booking = {
     uuid: uuidv4(),
-    id: generateUniqueBookingId(),
+    reservationId: generateUniqueReservationId(),
     roomId,
     start: startIso,
     end: endIso,
@@ -68,8 +68,8 @@ export function addBooking(roomId: string, startIso: string, endIso: string, boo
   return b;
 }
 
-export function deleteBooking(id: string): boolean {
-  const idx = bookings.findIndex(b => b.id === id);
+export function deleteBooking(reservationId: string): boolean {
+  const idx = bookings.findIndex(b => b.reservationId === reservationId);
   if (idx === -1) return false;
   bookings.splice(idx, 1);
   return true;

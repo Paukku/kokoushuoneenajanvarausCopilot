@@ -85,8 +85,8 @@ export function listBookings(roomId: string): Booking[] {
   return getBookingsForRoom(roomId);
 }
 
-export function cancelBooking(id: string): void {
-  if (!id) throw new ApiError(400, ErrorCodes.MISSING_REQUIRED_FIELD, 'Puuttuva kenttä: id');
-  const ok = deleteBooking(id);
+export function cancelBooking(reservationId: string): void {
+  if (!reservationId) throw new ApiError(400, ErrorCodes.MISSING_REQUIRED_FIELD, 'Puuttuva kenttä: reservationId');
+  const ok = deleteBooking(reservationId);
   if (!ok) throw new ApiError(404, ErrorCodes.BOOKING_NOT_FOUND, 'Varausta ei löytynyt annetulla tunnisteella');
 }
