@@ -12,8 +12,8 @@ describe('Booking Service - Reservation ID Validation', () => {
     const reservationIds = new Set<string>();
     
     for (let i = 0; i < 20; i++) {
-      const start = new Date(now + (i + 1) * 24 * 60 * 60 * 1000).toISOString();
-      const end = new Date(now + (i + 1) * 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString();
+      const start = new Date(now + (i + 1) * 24 * 60 * 60 * 1000);
+      const end = new Date(now + (i + 1) * 24 * 60 * 60 * 1000 + 60 * 60 * 1000);
 
       const booking = bookingService.createBooking({
         roomId: 'room-1',
@@ -31,8 +31,8 @@ describe('Booking Service - Reservation ID Validation', () => {
 
   test('should generate 6-character reservation ID', () => {
     const now = Date.now();
-    const start = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start = new Date(now + 24 * 60 * 60 * 1000);
+    const end = new Date(now + 25 * 60 * 60 * 1000);
 
     const booking = bookingService.createBooking({
       roomId: 'room-1',
@@ -47,8 +47,8 @@ describe('Booking Service - Reservation ID Validation', () => {
 
   test('should use only letters and numbers in reservation ID', () => {
     const now = Date.now();
-    const start = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start = new Date(now + 24 * 60 * 60 * 1000);
+    const end = new Date(now + 25 * 60 * 60 * 1000);
 
     const booking = bookingService.createBooking({
       roomId: 'room-1',
@@ -63,8 +63,8 @@ describe('Booking Service - Reservation ID Validation', () => {
 
   test('should allow case-insensitive reservation ID for cancellation', () => {
     const now = Date.now();
-    const start = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start = new Date(now + 24 * 60 * 60 * 1000);
+    const end = new Date(now + 25 * 60 * 60 * 1000);
 
     const booking = bookingService.createBooking({
       roomId: 'room-1',
@@ -91,8 +91,8 @@ describe('Booking Service - Reservation ID Validation', () => {
 
     const booking = bookingService.createBooking({
       roomId: 'room-1',
-      start,
-      end,
+      start: new Date(start),
+      end: new Date(end),
       bookerName: 'John Doe',
       bookerEmail: 'john@example.com'
     });
@@ -102,8 +102,8 @@ describe('Booking Service - Reservation ID Validation', () => {
     // But we verify that creating a new booking has a different ID
     const booking2 = bookingService.createBooking({
       roomId: 'room-2',
-      start,
-      end,
+      start: new Date(start),
+      end: new Date(end),
       bookerName: 'Jane Doe',
       bookerEmail: 'jane@example.com'
     });

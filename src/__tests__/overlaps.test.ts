@@ -9,8 +9,8 @@ describe('Booking Service - Overlap Detection', () => {
 
   test('should detect partial overlap at start', () => {
     const now = Date.now();
-    const start1 = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end1 = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start1 = new Date(now + 24 * 60 * 60 * 1000);
+    const end1 = new Date(now + 25 * 60 * 60 * 1000);
 
     bookingService.createBooking({
       roomId: 'room-1',
@@ -21,8 +21,8 @@ describe('Booking Service - Overlap Detection', () => {
     });
 
     // Overlap at start: starts 30min before first, ends 30min after first start
-    const start2 = new Date(now + 24 * 60 * 60 * 1000 - 30 * 60 * 1000).toISOString();
-    const end2 = new Date(now + 24 * 60 * 60 * 1000 + 30 * 60 * 1000).toISOString();
+    const start2 = new Date(start1.getTime() - 30 * 60 * 1000);
+    const end2 = new Date(start1.getTime() + 30 * 60 * 1000);
 
     expect(() => {
       bookingService.createBooking({
@@ -37,8 +37,8 @@ describe('Booking Service - Overlap Detection', () => {
 
   test('should detect partial overlap at end', () => {
     const now = Date.now();
-    const start1 = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end1 = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start1 = new Date(now + 24 * 60 * 60 * 1000);
+    const end1 = new Date(now + 25 * 60 * 60 * 1000);
 
     bookingService.createBooking({
       roomId: 'room-1',
@@ -49,8 +49,8 @@ describe('Booking Service - Overlap Detection', () => {
     });
 
     // Overlap at end: starts 30min before first ends, ends 30min after first ends
-    const start2 = new Date(now + 25 * 60 * 60 * 1000 - 30 * 60 * 1000).toISOString();
-    const end2 = new Date(now + 25 * 60 * 60 * 1000 + 30 * 60 * 1000).toISOString();
+    const start2 = new Date(end1.getTime() - 30 * 60 * 1000);
+    const end2 = new Date(end1.getTime() + 30 * 60 * 1000);
 
     expect(() => {
       bookingService.createBooking({
@@ -65,8 +65,8 @@ describe('Booking Service - Overlap Detection', () => {
 
   test('should detect full overlap', () => {
     const now = Date.now();
-    const start1 = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end1 = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start1 = new Date(now + 24 * 60 * 60 * 1000);
+    const end1 = new Date(now + 25 * 60 * 60 * 1000);
 
     bookingService.createBooking({
       roomId: 'room-1',
@@ -77,8 +77,8 @@ describe('Booking Service - Overlap Detection', () => {
     });
 
     // Completely overlapping
-    const start2 = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end2 = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start2 = new Date(start1.getTime());
+    const end2 = new Date(end1.getTime());
 
     expect(() => {
       bookingService.createBooking({
@@ -93,8 +93,8 @@ describe('Booking Service - Overlap Detection', () => {
 
   test('should detect nested booking (contained within)', () => {
     const now = Date.now();
-    const start1 = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end1 = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start1 = new Date(now + 24 * 60 * 60 * 1000);
+    const end1 = new Date(now + 25 * 60 * 60 * 1000);
 
     bookingService.createBooking({
       roomId: 'room-1',
@@ -105,8 +105,8 @@ describe('Booking Service - Overlap Detection', () => {
     });
 
     // Nested: starts 15min after first, ends 15min before first ends
-    const start2 = new Date(new Date(start1).getTime() + 15 * 60 * 1000).toISOString();
-    const end2 = new Date(new Date(end1).getTime() - 15 * 60 * 1000).toISOString();
+    const start2 = new Date(start1.getTime() + 15 * 60 * 1000);
+    const end2 = new Date(end1.getTime() - 15 * 60 * 1000);
 
     expect(() => {
       bookingService.createBooking({
@@ -121,8 +121,8 @@ describe('Booking Service - Overlap Detection', () => {
 
   test('should allow same time in different rooms', () => {
     const now = Date.now();
-    const start = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start = new Date(now + 24 * 60 * 60 * 1000);
+    const end = new Date(now + 25 * 60 * 60 * 1000);
 
     bookingService.createBooking({
       roomId: 'room-1',
@@ -146,8 +146,8 @@ describe('Booking Service - Overlap Detection', () => {
 
   test('should use room-specific overlap detection', () => {
     const now = Date.now();
-    const start = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start = new Date(now + 24 * 60 * 60 * 1000);
+    const end = new Date(now + 25 * 60 * 60 * 1000);
 
     bookingService.createBooking({
       roomId: 'room-1',

@@ -1,6 +1,7 @@
 import * as bookingService from '../services/bookingService';
 import { clearBookings } from '../data';
 import { ApiError, ErrorCodes } from '../services/errors';
+import { validateCreateBookingInput } from '../middleware/validationMiddleware';
 
 describe('Booking Service - Room Validation', () => {
   beforeEach(() => {
@@ -9,11 +10,11 @@ describe('Booking Service - Room Validation', () => {
 
   test('should reject booking for empty room ID', () => {
     const now = Date.now();
-    const start = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start = new Date(now + 24 * 60 * 60 * 1000);
+    const end = new Date(now + 25 * 60 * 60 * 1000);
 
     expect(() => {
-      bookingService.createBooking({
+      validateCreateBookingInput({
         roomId: '',
         start,
         end,
@@ -25,11 +26,11 @@ describe('Booking Service - Room Validation', () => {
 
   test('should reject booking for unknown room', () => {
     const now = Date.now();
-    const start = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start = new Date(now + 24 * 60 * 60 * 1000);
+    const end = new Date(now + 25 * 60 * 60 * 1000);
 
     expect(() => {
-      bookingService.createBooking({
+      validateCreateBookingInput({
         roomId: 'unknown-room',
         start,
         end,
@@ -58,8 +59,8 @@ describe('Booking Service - Room Validation', () => {
 
     for (let i = 0; i < validRoomIds.length; i++) {
       const roomId = validRoomIds[i];
-      const start = new Date(now + (i + 1) * 24 * 60 * 60 * 1000).toISOString();
-      const end = new Date(now + (i + 1) * 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString();
+      const start = new Date(now + (i + 1) * 24 * 60 * 60 * 1000);
+      const end = new Date(now + (i + 1) * 24 * 60 * 60 * 1000 + 60 * 60 * 1000);
 
       expect(() => {
         bookingService.createBooking({

@@ -1,5 +1,6 @@
 import * as bookingService from '../services/bookingService';
 import { clearBookings } from '../data';
+import { validateCreateBookingInput } from '../middleware/validationMiddleware';
 
 describe('Booking Service - Timestamps', () => {
   beforeEach(() => {
@@ -8,8 +9,8 @@ describe('Booking Service - Timestamps', () => {
 
   test('should have ISO 8601 formatted createdAt timestamp', () => {
     const now = Date.now();
-    const start = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start = new Date(now + 24 * 60 * 60 * 1000);
+    const end = new Date(now + 25 * 60 * 60 * 1000);
 
     const booking = bookingService.createBooking({
       roomId: 'room-1',
@@ -26,8 +27,8 @@ describe('Booking Service - Timestamps', () => {
 
   test('should have start and end in ISO 8601 format', () => {
     const now = Date.now();
-    const start = new Date(now + 24 * 60 * 60 * 1000).toISOString();
-    const end = new Date(now + 25 * 60 * 60 * 1000).toISOString();
+    const start = new Date(now + 24 * 60 * 60 * 1000);
+    const end = new Date(now + 25 * 60 * 60 * 1000);
 
     const booking = bookingService.createBooking({
       roomId: 'room-1',
@@ -37,22 +38,17 @@ describe('Booking Service - Timestamps', () => {
       bookerEmail: 'john@example.com'
     });
 
-    expect(booking.start).toBe(start);
-    expect(booking.end).toBe(end);
+    expect(booking.start).toBe(start.toISOString());
+    expect(booking.end).toBe(end.toISOString());
     expect(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(booking.start)).toBe(true);
     expect(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(booking.end)).toBe(true);
   });
 
   test('should accept dates without timezone (Z)', () => {
-    // Dates without timezone info should still work if they parse
-    // Use future dates
     const now = Date.now();
-    const futureDate = new Date(now + 24 * 60 * 60 * 1000);
-    const start = futureDate.toISOString().split('Z')[0]; // Remove Z
-    const end = new Date(futureDate.getTime() + 60 * 60 * 1000).toISOString().split('Z')[0];
+    const start = new Date(now + 24 * 60 * 60 * 1000);
+    const end = new Date(now + 25 * 60 * 60 * 1000);
 
-    // This might parse or fail depending on implementation
-    // JavaScript's Date() is lenient with timezone info
     const booking = bookingService.createBooking({
       roomId: 'room-1',
       start,
@@ -62,14 +58,16 @@ describe('Booking Service - Timestamps', () => {
     });
 
     expect(booking).toBeDefined();
+    expect(booking.start).toBe(start.toISOString());
+    expect(booking.end).toBe(end.toISOString());
   });
 
   test('should reject invalid date format', () => {
     expect(() => {
       bookingService.createBooking({
         roomId: 'room-1',
-        start: '2026-13-32T25:70:00Z', // Invalid date
-        end: '2026-01-22T10:30:00Z',
+        start: new Date('invalid-date-format'),
+        end: new Date('2026-01-22T10:30:00Z'),
         bookerName: 'John Doe',
         bookerEmail: 'john@example.com'
       });
@@ -80,8 +78,8 @@ describe('Booking Service - Timestamps', () => {
     expect(() => {
       bookingService.createBooking({
         roomId: 'room-1',
-        start: '2026-01-22T99:99:99Z', // Invalid time
-        end: '2026-01-22T10:30:00Z',
+        start: new Date('2026-01-22T25:99:99Z'), // Invalid time
+        end: new Date('2026-01-22T10:30:00Z'),
         bookerName: 'John Doe',
         bookerEmail: 'john@example.com'
       });
