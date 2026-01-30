@@ -6,7 +6,6 @@ import { validateCreateBookingInput } from '../middleware/validationMiddleware';
 const router = Router();
 
 router.post('/', asyncHandler((req, res) => {
-  const { roomId, start, end, bookerName, bookerEmail } = req.body;
    // Validate input using middleware
   const validatedInput = validateCreateBookingInput(req.body);
 
