@@ -1,18 +1,16 @@
 import { Router } from 'express';
 import * as bookingService from '../services/bookingService';
 import { asyncHandler } from '../middleware/errorHandler';
+import { validateCreateBookingInput } from '../middleware/validationMiddleware';
 
 const router = Router();
 
 router.post('/', asyncHandler((req, res) => {
   const { roomId, start, end, bookerName, bookerEmail } = req.body;
-  const booking = bookingService.createBooking({
-    roomId,
-    start,
-    end,
-    bookerName,
-    bookerEmail
-  });
+   // Validate input using middleware
+  const validatedInput = validateCreateBookingInput(req.body);
+
+  const booking = bookingService.createBooking(validatedInput);
   res.status(201).json(booking);
 }));
 

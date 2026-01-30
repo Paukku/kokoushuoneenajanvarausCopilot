@@ -2,12 +2,11 @@ import { Booking, Booker } from '../models';
 import { roomExists, isOverlap, addBooking, deleteBooking, getBookingsForRoom } from '../data';
 import { ApiError, ErrorCodes } from './errors';
 import { v4 as uuidv4 } from 'uuid';
-import { validateCreateBookingInput } from '../middleware/validationMiddleware';
 
 export interface CreateBookingInput {
   roomId: string;
-  start: string;
-  end: string;
+  start: Date;
+  end: Date;
   bookerName: string;
   bookerEmail: string;
 }
@@ -15,27 +14,17 @@ export interface CreateBookingInput {
 export function createBooking(input: CreateBookingInput): Booking {
   const { roomId, start, end, bookerName, bookerEmail } = input;
 
-  // Validate input using middleware
-  validateCreateBookingInput(input);
-
   const trimmedEmail = bookerEmail.trim();
   
-  // Parse dates
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  
-  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-    throw new ApiError(400, ErrorCodes.INVALID_TIME_RANGE, 'Virheellinen päivämäärämuoto. Käytä ISO 8601 -muotoa (YYYY-MM-DDTHH:mm:ssZ).');
-  }
-
+ // business logic validations
   // Check for past bookings
   const now = new Date();
-  if (startDate < now) {
+  if (start < now) {
     throw new ApiError(400, ErrorCodes.BOOKING_IN_PAST, 'Varauksen aloitusaika ei voi olla menneisyydessä');
   }
 
   // Check start is before end
-  if (startDate >= endDate) {
+  if (start >= end) {
     throw new ApiError(400, ErrorCodes.INVALID_TIME_RANGE, 'Aloitusajan täytyy olla ennen lopetusaikaa');
   }
 

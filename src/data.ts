@@ -41,9 +41,9 @@ export function getBookingsForRoom(roomId: string): Booking[] {
     .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 }
 
-export function isOverlap(roomId: string, startIso: string, endIso: string): boolean {
-  const start = new Date(startIso).getTime();
-  const end = new Date(endIso).getTime();
+export function isOverlap(roomId: string, startIso: Date, endIso: Date): boolean {
+  const start = startIso.getTime();
+  const end = endIso.getTime();
   for (const b of bookings) {
     if (b.roomId !== roomId) continue;
     const s = new Date(b.start).getTime();
@@ -54,13 +54,13 @@ export function isOverlap(roomId: string, startIso: string, endIso: string): boo
   return false;
 }
 
-export function addBooking(roomId: string, startIso: string, endIso: string, booker: Booker): Booking {
+export function addBooking(roomId: string, startIso: Date, endIso: Date, booker: Booker): Booking {
   const b: Booking = {
     uuid: uuidv4(),
     reservationId: generateUniqueReservationId(),
     roomId,
-    start: startIso,
-    end: endIso,
+    start: startIso.toISOString(),
+    end: endIso.toISOString(),
     booker,
     createdAt: new Date().toISOString()
   };

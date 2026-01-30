@@ -12,8 +12,15 @@ function isValidEmail(email: string): boolean {
 function isValidName(name: string): boolean {
   return Boolean(name && name.trim().length > 0);
 }
+interface ValidatedCreateBookingInput {
+  roomId: string;
+  start: Date;
+  end: Date;
+  bookerName: string;
+  bookerEmail: string;
+}
 
-export function validateCreateBookingInput(input: CreateBookingInput): void {
+export function validateCreateBookingInput(input: CreateBookingInput): ValidatedCreateBookingInput {
   const { roomId, start, end, bookerName, bookerEmail } = input; 
 
   // Validate required fields
@@ -36,5 +43,23 @@ export function validateCreateBookingInput(input: CreateBookingInput): void {
 
   // Validate room exists
   if (!roomExists(roomId)) throw new ApiError(404, ErrorCodes.ROOM_NOT_FOUND, 'Huonetta ei löytynyt');
+
+    // Parse dates
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    throw new ApiError(400, ErrorCodes.INVALID_TIME_RANGE, 'Virheellinen päivämäärämuoto. Käytä ISO 8601 -muotoa (YYYY-MM-DDTHH:mm:ssZ).');
+  }
+
+  const validatedBody ={
+    roomId,
+    start: startDate,
+    end: endDate,
+    bookerName: bookerName.trim(),
+    bookerEmail: trimmedEmail
+  };
+
+  return validatedBody;
 
 }
