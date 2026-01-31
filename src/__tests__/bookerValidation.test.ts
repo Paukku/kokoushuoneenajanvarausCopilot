@@ -1,12 +1,13 @@
 import * as bookingService from '../services/bookingService';
-import { clearBookings, clearBookers } from '../data';
-import { ApiError, ErrorCodes } from '../services/errors';
+import { clearBookings } from '../data';
+import { ApiError } from '../services/errors';
 import { validateCreateBookingInput } from '../middleware/validationMiddleware';
+import { bookerRepository } from '../repositories/bookerRepository';
 
 describe('Booking Service - Booker Validation', () => {
   beforeEach(() => {
+    bookerRepository.clear();
     clearBookings();
-    clearBookers();
   });
 
   test('should reject booking with name that is only whitespace', () => {

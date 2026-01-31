@@ -1,6 +1,8 @@
-import { Booking, Booker } from '../models';
-import { roomExists, isOverlap, addBooking, deleteBooking, getBookingsForRoom, addBookerIfNotExists } from '../data';
+import { Booking } from '../models';
+import { roomExists, isOverlap, addBooking, deleteBooking, getBookingsForRoom } from '../data';
 import { ApiError, ErrorCodes } from './errors';
+import { bookerRepository } from '../repositories/bookerRepository';
+import { hkdf } from 'crypto';
 
 export interface CreateBookingInput {
   roomId: string;
@@ -33,12 +35,16 @@ export function createBooking(input: CreateBookingInput): Booking {
   }
 
   // Get or create booker - check for email conflicts
-  const booker = addBookerIfNotExists(trimmedEmail, bookerName.trim());
-  if (!booker) {
-    throw new ApiError(409, ErrorCodes.BOOKER_EMAIL_ALREADY_IN_USE, 'Sähköpostiosoite on jo käytössä eri henkilön nimellä');
-  }
+  const booker = bookerRepository.addIfNotExists(trimmedEmail, bookerName.trim());
 
-  return addBooking(roomId, start, end, booker);
+if (!booker) {
+  throw new ApiError(409, ErrorCodes.BOOKER_EMAIL_ALREADY_IN_USE, 'Sähköpostiosoite on jo käytössä toiselle varaajalle');
+}
+
+const finalBooker = booker;
+
+
+  return addBooking(roomId, start, end, finalBooker);
 }
 
 export function listBookings(roomId: string): Booking[] {

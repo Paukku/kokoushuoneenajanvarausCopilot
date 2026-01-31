@@ -1,11 +1,11 @@
 import * as bookingService from '../services/bookingService';
-import { clearBookings, clearBookers } from '../data';
-import { ApiError, ErrorCodes } from '../services/errors';
+import { clearBookings } from '../data';
+import { bookerRepository } from '../repositories/bookerRepository';
 
 describe('Booking Service - Reservation ID Validation', () => {
   beforeEach(() => {
+    bookerRepository.clear();
     clearBookings();
-    clearBookers();
   });
 
   test('should ensure reservation IDs are unique across multiple bookings', () => {

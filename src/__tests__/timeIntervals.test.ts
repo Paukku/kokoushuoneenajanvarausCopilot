@@ -1,12 +1,13 @@
 import * as bookingService from '../services/bookingService';
-import { clearBookings, clearBookers } from '../data';
-import { ApiError, ErrorCodes } from '../services/errors';
+import { clearBookings } from '../data';
+import { ApiError } from '../services/errors';
+import { bookerRepository } from '../repositories/bookerRepository';
 
 describe('Booking Service - Time Intervals Edge Cases', () => {
   beforeEach(() => {
+    bookerRepository.clear();
     clearBookings();
-    clearBookers();
-  });
+  });;
 
   test('should allow booking starting at exactly now', () => {
     // This test is tricky because "now" changes. We need a time very close to now.

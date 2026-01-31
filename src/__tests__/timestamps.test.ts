@@ -1,11 +1,11 @@
 import * as bookingService from '../services/bookingService';
-import { clearBookings, clearBookers } from '../data';
-import { validateCreateBookingInput } from '../middleware/validationMiddleware';
+import { clearBookings } from '../data';
+import { bookerRepository } from '../repositories/bookerRepository';
 
 describe('Booking Service - Timestamps', () => {
   beforeEach(() => {
+    bookerRepository.clear();
     clearBookings();
-    clearBookers();
   });
 
   test('should have ISO 8601 formatted createdAt timestamp', () => {
