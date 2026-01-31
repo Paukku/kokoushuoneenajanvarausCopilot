@@ -1,10 +1,11 @@
 import * as bookingService from '../services/bookingService';
-import { clearBookings } from '../data';
+import { clearBookings, clearBookers } from '../data';
 import { ApiError, ErrorCodes } from '../services/errors';
 
 describe('Booking Service - Overlap Detection', () => {
   beforeEach(() => {
     clearBookings();
+    clearBookers();
   });
 
   test('should detect partial overlap at start', () => {

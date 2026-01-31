@@ -1,7 +1,6 @@
 import { Booking, Booker } from '../models';
-import { roomExists, isOverlap, addBooking, deleteBooking, getBookingsForRoom } from '../data';
+import { roomExists, isOverlap, addBooking, deleteBooking, getBookingsForRoom, addBookerIfNotExists } from '../data';
 import { ApiError, ErrorCodes } from './errors';
-import { v4 as uuidv4 } from 'uuid';
 
 export interface CreateBookingInput {
   roomId: string;
@@ -33,12 +32,11 @@ export function createBooking(input: CreateBookingInput): Booking {
     throw new ApiError(409, ErrorCodes.BOOKING_OVERLAP, 'Aikaväli menee päällekkäin olemassa olevan varauksen kanssa');
   }
 
-  // Create booking
-  const booker: Booker = {
-    uuid: uuidv4(),
-    name: bookerName.trim(),
-    email: trimmedEmail
-  };
+  // Get or create booker - check for email conflicts
+  const booker = addBookerIfNotExists(trimmedEmail, bookerName.trim());
+  if (!booker) {
+    throw new ApiError(409, ErrorCodes.BOOKER_EMAIL_ALREADY_IN_USE, 'Sähköpostiosoite on jo käytössä eri henkilön nimellä');
+  }
 
   return addBooking(roomId, start, end, booker);
 }

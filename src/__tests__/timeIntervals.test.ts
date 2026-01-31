@@ -1,10 +1,11 @@
 import * as bookingService from '../services/bookingService';
-import { clearBookings } from '../data';
+import { clearBookings, clearBookers } from '../data';
 import { ApiError, ErrorCodes } from '../services/errors';
 
 describe('Booking Service - Time Intervals Edge Cases', () => {
   beforeEach(() => {
     clearBookings();
+    clearBookers();
   });
 
   test('should allow booking starting at exactly now', () => {

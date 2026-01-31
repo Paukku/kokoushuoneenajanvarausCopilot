@@ -367,3 +367,82 @@ Fixed Type errors by converting ISO string dates to Date objects where needed
 Adjusted test assertions to expect ISO string format in booking responses
 Ensured all error handling tests properly validate business logic errors
 The test suite is complete and ready for use.
+
+--
+PROMPTI:
+Muokkaa bookerin validointi koodia niin, että:
+
+1. yhdellä sähköpostilla saa olla vain yksi henkilö, jos toinen henkilö koittaa samalla sähköpostilla tehdä varauksen niin tulee virhe.
+2. Jos sähköposti löytyy jo booker -listasta, sitä ei luoda uudelleen.
+
+AI:
+Nyt tarvitsen katsoa data.ts tiedostoon, jotta ymmärretään miten bookerit tallennetaan ja miten voin tarkistaa olemassa olevia bookereja:
+
+Nyt ymmärrän rakenteen. Tarkistan mallit:
+
+Read models.ts
+
+Nyt ymmärrän kaikki. Käyttäjä haluaa:
+
+Yhdellä sähköpostilla saa olla vain yksi henkilö (nimi). Jos toinen henkilö (eri nimi) koittaa käyttää samaa sähköpostia, tulee virhe.
+Jos sähköposti on jo käytössä, sitä ei luoda uudelleen - käytetään olemassa olevaa bookeria.
+Tämä tarkoittaa että tarvitsen:
+
+Funktio data.ts:ssä, joka etsii bookeria sähköpostin perusteella
+Validaation, joka tarkistaa onko sähköposti jo käytössä ja jos on, onko nimi sama
+Virhekoodi uudelle virheelle
+Tallennettujen bookerien lista
+Toiminta:
+
+Jos sähköposti on jo käytössä SAMALLA nimellä → käytä olemassa olevaa bookeria
+Jos sähköposti on jo käytössä ERI nimellä → virhe (BOOKER_EMAIL_ALREADY_IN_USE tai vastaava)
+Edited
+errors.ts+2-1
+Starting: Lisää bokerit tracking data.ts:ssä (2/5)
+
+Edited
+data.ts+3-0
+Nyt lisään apufunktiot data.ts:n loppuun:
+
+Read data.ts, lines 60 to 70
+
+Edited
+data.ts+35-0
+Starting: Muokkaa createBooking-funktiota (4/5)
+
+Edited
+bookingService.ts+6-7
+Starting: Päivitä testit (5/5)
+
+Edited
+bookerValidation.test.ts+2-1
+Read bookerValidation.test.ts, lines 120 to 136
+
+Edited
+bookerValidation.test.ts+112-1
+Nyt pitää poistaa käyttämätön uuidv4 importti bookingService.ts:stä:
+
+Edited
+bookingService.ts+0-1
+Completed: Päivitä testit (5/5)
+
+Varmistetaan muutokset suorittamalla testit:
+
+npm test -- bookerValidation.test.ts
+Tässä on ongelma. Vanha testi "should allow same email with different case" olettaa että eri nimiä saa käyttää samalla sähköpostilla eri tapauksissa. Tämä testi pitää poistaa tai muuttaa, koska se on ristiriidassa uuden vaatimuksen kanssa. Katsotaan kyseinen testi:
+
+Read bookerValidation.test.ts, lines 45 to 68
+
+Poistetaan tämä vanha testi, koska se on nyt virheellinen uuden vaatimuksen kanssa:
+
+Edited
+bookerValidation.test.ts+0-28
+npm test -- bookerValidation.test.ts
+Loistava! Nyt ajetaan kaikki testit varmistaaksemme että mikään muu ei hajonnut:
+
+npm test
+Näyttää siltä että basicFunctionality.test.ts:ssa on testi joka yrittää luoda varauksia samalla sähköpostilla mutta eri nimillä. Katsotaan kyseinen testi:
+
+Read basicFunctionality.test.ts, lines 1 to 120
+
+Copilot has been working on this problem for a while. It can continue to iterate, or you can send a new message to refine your prompt. Configure max requests.

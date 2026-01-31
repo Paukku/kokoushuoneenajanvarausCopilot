@@ -1,10 +1,11 @@
 import * as bookingService from '../services/bookingService';
-import { clearBookings, ROOMS } from '../data';
+import { clearBookings, clearBookers, ROOMS } from '../data';
 import { ApiError, ErrorCodes } from '../services/errors';
 
 describe('Booking Service - Basic Functionality', () => {
   beforeEach(() => {
     clearBookings();
+    clearBookers();
   });
 
   describe('Booking Creation', () => {

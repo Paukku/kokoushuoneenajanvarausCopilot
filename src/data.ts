@@ -12,6 +12,9 @@ export const ROOMS: Room[] = [
 
 export const bookings: Booking[] = [];
 
+// Track bookers by email to prevent duplicate emails with different names
+export const bookers: Map<string, Booker> = new Map();
+
 // Generate a 6-character reservation ID
 function generateReservationId(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -78,4 +81,39 @@ export function deleteBooking(reservationId: string): boolean {
 // Clear all bookings (for testing)
 export function clearBookings(): void {
   bookings.length = 0;
+}
+
+// Get booker by email
+export function getBookerByEmail(email: string): Booker | undefined {
+  return bookers.get(email.toLowerCase());
+}
+
+// Add or get existing booker - returns booker or null if email exists with different name
+export function addBookerIfNotExists(email: string, name: string): Booker | null {
+  const lowerEmail = email.toLowerCase();
+  const existingBooker = bookers.get(lowerEmail);
+  
+  if (existingBooker) {
+    // Email exists - check if name matches
+    if (existingBooker.name === name) {
+      // Same name, return existing booker
+      return existingBooker;
+    }
+    // Different name with same email - return null to signal error
+    return null;
+  }
+  
+  // Email doesn't exist - create new booker
+  const newBooker: Booker = {
+    uuid: uuidv4(),
+    name,
+    email
+  };
+  bookers.set(lowerEmail, newBooker);
+  return newBooker;
+}
+
+// Clear bookers (for testing)
+export function clearBookers(): void {
+  bookers.clear();
 }

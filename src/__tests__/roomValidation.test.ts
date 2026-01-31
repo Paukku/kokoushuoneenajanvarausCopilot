@@ -1,11 +1,12 @@
 import * as bookingService from '../services/bookingService';
-import { clearBookings } from '../data';
+import { clearBookings, clearBookers } from '../data';
 import { ApiError, ErrorCodes } from '../services/errors';
 import { validateCreateBookingInput } from '../middleware/validationMiddleware';
 
 describe('Booking Service - Room Validation', () => {
   beforeEach(() => {
     clearBookings();
+    clearBookers();
   });
 
   test('should reject booking for empty room ID', () => {
