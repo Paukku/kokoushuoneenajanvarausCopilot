@@ -1142,3 +1142,240 @@ Tämä README + TESTING.md -pari on jo tasolla, jota näkee oikeissa backend-pro
 Jos haluat vielä yhden viimeisen silauksen, seuraava askel olisi API contract (endpointit ilman toteutusta) – se tekisi tästä lähes täydellisen.
 
 Sano vain, jatketaanko 👌
+---
+PROMPTI:
+"2. Validointi on käsin tehtyä ja raskasta ylläpitää
+
+Vaikka validointi on hyvää, se on:
+pitkä
+helposti kasvava
+osittain päällekkäistä (esim. pakolliset kentät)
+
+Tämä ei ole väärin, mutta skaalautuvuus kärsii, jos kenttiä tulee lisää."
+
+Miten muuttaisit tätä
+
+AI:
+Loistava kysymys – tää on juuri se kohta, missä hyvä junior alkaa näyttää midiltä 👌
+Puretaan tämä ajattelutasolla ja sitten annan konkreettisen, mutta hallitun ratkaisun.
+
+Mikä nykyisessä tavassa oikeasti mättää?
+
+Sun nykyinen validointi on:
+
+✅ eksplisiittistä
+✅ helposti luettavaa
+❌ ei keskitettyä
+❌ ei uudelleenkäytettävää
+❌ kasvaa lineaarisesti kenttien mukana
+
+Ongelma ei ole “käsin tehty”, vaan:
+validointilogiikka on hajallaan ja imperatiivista
+
+Kun kenttiä tulee lisää:
+if-else -ketjut pitenevät
+virheiden yhdenmukaisuus kärsii
+testaus monimutkaistuu
+
+Tavoitetila (tuotantimainen ajattelumalli)
+
+Haluat:
+yhden paikan, jossa inputin muoto määritellään
+yhden paikan, jossa virheet syntyvät
+business-logiikan keskittyvän sääntöihin, ei muotoon
+
+Ajattele kerroksia näin:
+Request → Validation → Business Rules → Persistence
+
+
+Nyt validointi ja business rules ovat sekaisin.
+3 tapaa parantaa tätä (järjestyksessä “oikea elämä”)
+🥉 1. Kevyt parannus ilman kirjastoja (minimiaskel)
+
+Mitä muuttuisi ajattelussa
+yksi funktio per DTO
+ei enää hajallaan olevia if (!field) -tarkistuksia
+
+Esim:
+validateCreateBookingInput(input)
+palauttaa validoidun objektin tai heittää ApiErrorin
+
+➡️ Plussa:
+helppo
+ei uusia riippuvuuksia
+
+➡️ Miinus:
+edelleen käsin
+kasvaa ajan myötä
+
+👉 Tämä on hyvä parannus demo-/harjoitusprojektiin.
+
+🥈 2. Skeemavalidointi (suositeltu tuotannossa)
+Tämä on se, mitä 90 % oikeista backend-projekteista tekee.
+
+Ajatus:
+määrittelet skeeman
+annat kirjaston hoitaa:
+pakolliset kentät
+tyypit
+perusmuodot (email, string, date)
+
+Yleisiä kirjastoja:
+Zod (erittäin suosittu TS-maailmassa)
+Joi
+Yup
+
+Ajatusmalli:
+“Tämä on bookingin muoto. Kaikki mikä ei täytä tätä, hylätään.”
+
+Business service saa:
+aina validin datan
+ei tarvetta tarkistaa tyhjiä kenttiä
+
+🥇 3. Validointi middlewareen (paras rakenne)
+
+Tämä on arkkitehtuurinen parannus, ei vain tekninen.
+
+Route
+ ├─ Validation middleware
+ ├─ Controller
+ └─ Service (business rules)
+
+
+Muutokset:
+reitti ei tee validointia
+service ei tee muotovalidointia
+
+service keskittyy:
+päällekkäisyyksiin
+aikaan
+huoneisiin
+--
+PROMPTI:
+Booker on nyt globaali state. Mitä ehdotat, että tälle tehdään?
+
+AI:
+Hyvä nosto ⚠️ – tämä on ihan oikea arkkitehtuurihälytin, ei pikkunipotus. Otetaan se rauhassa ja järkevästi.
+
+Tällä hetkellä sinulla on:
+export const bookers: Map<string, Booker> = new Map();
+
+
+➡️ eli globaali mutable state, joka:
+elää koko prosessin ajan
+ei nollaudu automaattisesti
+käyttäytyy eri tavalla testissä vs tuotannossa
+ei skaalaudu useaan instanssiin
+
+Mutta: kaikki globaalit statet eivät ole automaattisesti pahoja. Kyse on mitä teet seuraavaksi.
+
+🔍 Ongelman ydin
+
+Booker on:
+domain-entiteetti (käyttäjä)
+jaettu usean varauksen välillä
+tunnistetaan sähköpostilla
+
+Mutta nyt:
+se elää irrallaan varauksista
+ilman selkeää elinkaarimallia
+ilman “omistajaa”
+
+✅ 4 vaihtoehtoa (helpoimmasta → oikeaoppisimpaan)
+🟢 Vaihtoehto 1: Pidä se näin (mutta tee siitä tietoinen päätös)
+
+Tämä on OK jos:
+tämä on oppimisprojekti / demo
+ei ole monia instansseja
+ei ole pysyvää tallennusta
+
+Parannukset:
+dokumentoi tämä READMEen
+nollaa bookers testien alussa
+älä anna muiden layerien koskea siihen suoraan
+👉 Nopein, täysin hyväksyttävä nyt
+
+🟡 Vaihtoehto 2: Piilota globaali state repositoryyn (SUOSITTELEN)
+Tämä on sweet spot sinulle juuri nyt 👌
+
+bookerRepository.ts
+class BookerRepository {
+  private bookers = new Map<string, Booker>();
+
+  getByEmail(email: string): Booker | undefined {
+    return this.bookers.get(email.toLowerCase());
+  }
+
+  save(booker: Booker): void {
+    this.bookers.set(booker.email.toLowerCase(), booker);
+  }
+
+  clear(): void {
+    this.bookers.clear();
+  }
+}
+
+export const bookerRepository = new BookerRepository();
+
+
+Hyödyt:
+globaali state on kapseloitu
+helppo vaihtaa tietokantaan
+testit helpottuvat
+service ei tiedä miten data tallennetaan
+
+➡️ Tämä on se, mitä tekisin sinun tilanteessasi
+
+🟠 Vaihtoehto 3: Booker ei ole oma entity
+
+Radikaalimpi:
+Booker on vain osa Bookingia
+ei globaalia listaa
+sama email voi esiintyä useassa bookingissa
+konfliktit tarkistetaan bookings-listasta
+
+bookings.some(
+  b => b.booker.email === email && b.booker.name !== name
+)
+
+Hyödyt:
+ei globaalia statea
+yksinkertainen
+
+Haitat:
+O(n) tarkistus
+booker-identiteetti epämääräinen
+➡️ hyvä vain pieniin demoihin
+
+🔴 Vaihtoehto 4: Oikea käyttäjäjärjestelmä
+Users-taulu
+uniikki email constraint
+autentikaatio
+➡️ Overkill tässä vaiheessa, mutta tämä on polun pää.
+
+🎯 Mitä suosittelen sinulle nyt
+
+👉 Vaihtoehto 2: Repository-pattern
+
+Se:
+poistaa “globaali state” -pahan maineen
+näyttää senioritason rakennetta
+ei räjäytä projektin kokoa
+tekee Copilotista hyödyllisemmän jatkossa
+
+✍️ Bonus: miten tämä kirjoitetaan READMEen
+
+Booker data is currently stored in an in-memory repository.
+The repository pattern is used to encapsulate state and allow future migration to a persistent database without changing business logic.
+
+Tämä yksi kappale = 💼 LinkedIn-ready.
+
+Jos haluat, voin seuraavaksi:
+
+refaktoroida data.ts → repository-malliin
+
+näyttää miten testit muuttuvat
+
+auttaa sinua perustelemaan tämän ratkaisun arkkitehtuurina (tosi hyvä työhaastattelussa)
+
+Tämä on jo oikeasti hyvää backend-ajattelua – nyt et enää “koodaa”, vaan suunnittelet 🔥
