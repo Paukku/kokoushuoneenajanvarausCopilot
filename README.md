@@ -1,6 +1,19 @@
 # Kokoushuoneiden varausrajapinta
 
-REST-tyyppinen rajapinta kokoushuoneiden varaamiseen. Sovellus toteutettu TypeScriptilla Node.js-ympäristössä.
+Yksinkertainen kokoushuoneiden varausjärjestelmä, toteutettu Express + TypeScript -pinolla.
+API mahdollistaa kokoushuoneiden varaamisen, varausten listauksen ja peruutuksen, sekä hallinnoi varauksia tekeviä käyttäjiä (bookereita).
+
+## Keskeiset ominaisuudet
+- Varausten luonti, listaus ja peruutus
+- BookerRepository: kapseloi bookerit ja varmistaa sähköpostien uniikin käytön
+- Uniikit sähköpostit: yhdellä sähköpostilla voi olla vain yksi nimi; eri nimi samalla sähköpostilla palauttaa virheen
+- Syötteen validointi middlewarellä (pakolliset kentät, nimi, sähköposti, huoneen olemassaolo)
+- Tarkistus aikaväleille ja päällekkäisyyksien esto
+- Aloitusaika ei voi olla menneisyydessä, aloitusaika < lopetusaika
+- ISO 8601 -päivämääräformaatit (YYYY-MM-DDTHH:mm:ssZ)
+- Virheilmoitukset yhtenäisessä muodossa: { code, message, timestamp }
+- UUID:t varauksille ja bookereille, sekä lyhyt reservationId käyttäjälle
+- Testattavuus: varaukset ja bookerit voidaan nollata yksikkötestejä varten
 
 ## Asennus ja käynnistys
 
@@ -128,6 +141,7 @@ Kaikki virheet palautetaan samassa muodossa:
 | ROOM_NOT_FOUND | Huonetta ei löytynyt | 404 |
 | BOOKING_NOT_FOUND | Varausta ei löytynyt | 404 |
 | BOOKING_OVERLAP | Varaus menee päällekkäin toisen kanssa | 409 |
+| BOOKER_EMAIL_ALREADY_IN_USE | Sähköpostiosoite on jo käytössä toiselle varaajalle | 409 |
 
 ## Liiketoimintasäännöt
 
@@ -139,7 +153,23 @@ Kaikki virheet palautetaan samassa muodossa:
 - Varaustunnus on yksilöllinen 6-merkkinen tunnus
 - Jokaisella varaajalla ja varauksella on UUID
 
+## Repositoryt ja kapselointi
+
+BookerRepository:
+- Globaali state kapseloitu repositoryyn
+- Estää duplicate email-ongelmat
+- Tarjoaa selkeän rajapinnan bookerien hakemiseen ja lisäämiseen
+
+Bookings (data.ts):
+- Tallentaa varaukset ja huoneet
+- Tarjoaa CRUD-toiminnot varauksille
+
+Huomio: varauksien ja bookerien clear-funktiot on tarkoitettu vain testaukseen.
+
 ## Testit
+
+- Testattavuus: middleware ja service eriytetty, mahdollistaa yksikkötestit
+- Future improvement: mahdollinen bookingRepository, globaali state kapseloitu jo bookereille
 
 Projektissa on kattavat yksikkötestit:
 
@@ -158,3 +188,17 @@ Testien ajaminen:
 npm test
 npm test -- --watch  # Valvontamodi
 ```
+
+## Päivämäärät ja muodot
+
+- Syötteet saapuvat middlewareen stringinä (ISO 8601)
+- Middleware muuntaa ne Date-objekteiksi service-tasolle
+- Tallennus bookings-listaan tapahtuu stringinä (toISOString()), jotta voidaan helposti serialisoida JSONiksi
+
+## Kehitystavat
+
+- TypeScript + Express
+- Middleware validointiin
+- AsyncHandler virheenkäsittelyyn
+- UUID + lyhyt reservationId
+- Testattavuus huomioitu (clearBookings, clearBookers)
